@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   },
 };
 
+const APPLY_URL =
+  process.env.NEXT_PUBLIC_APPLY_URL ||
+  "https://docs.google.com/forms/d/e/1FAIpQLSdbWHDsUuSMjw7w3GgIFDmR_vB1w7LAneoxF7qjfzjL06OpXQ/viewform";
+
 export default function GlobalNetworkingPage() {
   return (
     <div className="page">
@@ -36,7 +40,12 @@ export default function GlobalNetworkingPage() {
                 events to change the world.
               </p>
               <div className="cta-row">
-                <a className="btn btn-primary" href="#apply">
+                <a
+                  className="btn btn-primary"
+                  href={APPLY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Join the Club
                 </a>
               </div>
@@ -66,7 +75,9 @@ export default function GlobalNetworkingPage() {
               <div className="cta-row">
                 <a
                   className="btn btn-primary"
-                  href="mailto:contact@olivierclub.com?subject=Membership%20application"
+                  href={APPLY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <span>Apply Now</span>
                   <span className="arrow">→</span>

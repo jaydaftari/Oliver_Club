@@ -4,6 +4,9 @@ import Footer from "@/components/Footer";
 import VideoBlock from "@/components/VideoBlock";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://olivierclub.com";
+const APPLY_URL =
+  process.env.NEXT_PUBLIC_APPLY_URL ||
+  "https://docs.google.com/forms/d/e/1FAIpQLSdbWHDsUuSMjw7w3GgIFDmR_vB1w7LAneoxF7qjfzjL06OpXQ/viewform";
 
 export const metadata: Metadata = {
   title: "Market Intelligence Program",
@@ -111,7 +114,9 @@ export default function MarketIntelligencePage() {
             </p>
             <a
               className="btn btn-primary"
-              href="mailto:contact@olivierclub.com?subject=Market%20Intelligence%20Program%20application"
+              href={APPLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <span>Apply Now</span>
               <span className="arrow">→</span>

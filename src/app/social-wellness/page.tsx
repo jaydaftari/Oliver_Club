@@ -3,6 +3,9 @@ import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://olivierclub.com";
+const APPLY_URL =
+  process.env.NEXT_PUBLIC_APPLY_URL ||
+  "https://docs.google.com/forms/d/e/1FAIpQLSdbWHDsUuSMjw7w3GgIFDmR_vB1w7LAneoxF7qjfzjL06OpXQ/viewform";
 
 export const metadata: Metadata = {
   title: "Social Wellness Special",
@@ -36,7 +39,12 @@ export default function SocialWellnessPage() {
                 their decision-making in a better way.
               </p>
               <div className="cta-row">
-                <a className="btn btn-primary" href="#apply">
+                <a
+                  className="btn btn-primary"
+                  href={APPLY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Join the Club
                 </a>
               </div>
@@ -58,7 +66,9 @@ export default function SocialWellnessPage() {
               <div className="cta-row">
                 <a
                   className="btn btn-primary"
-                  href="mailto:contact@olivierclub.com?subject=Membership%20application"
+                  href={APPLY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <span>Apply Now</span>
                   <span className="arrow">→</span>
