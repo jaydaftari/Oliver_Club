@@ -61,7 +61,7 @@ export default async function BlogPage() {
                           src={article.cover_url}
                           alt={article.title}
                           fill
-                          style={{ objectFit: "cover" }}
+                          style={{ objectFit: "contain" }}
                           sizes="(max-width: 600px) 100vw, 50vw"
                         />
                       </div>

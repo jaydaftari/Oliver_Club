@@ -587,12 +587,12 @@ img {
 }
 
 .discussion-card {
-  flex: 0 0 clamp(220px, 24vw, 300px);
+  flex: 0 0 clamp(280px, 32vw, 420px);
   scroll-snap-align: start;
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 10;
   background: var(--bg-soft);
   display: block;
   text-decoration: none;
@@ -611,7 +611,7 @@ img {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
@@ -870,7 +870,7 @@ img {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
