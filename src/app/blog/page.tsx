@@ -41,20 +41,14 @@ export default async function BlogPage() {
 
           <section className="blog-grid">
             {dbArticles.length === 0 ? (
-              <p style={{ color: "#6B6558", gridColumn: "1/-1" }}>
-                No discussions published yet.
-              </p>
+              <p style={{ color: "#6B6558", gridColumn: "1/-1" }}>No discussions published yet.</p>
             ) : (
               dbArticles.map((article) => {
                 const date = article.published_at
                   ? new Date(article.published_at)
                   : new Date(article.created_at);
                 return (
-                  <Link
-                    key={article.id}
-                    className="blog-card"
-                    href={`/blog/${article.slug}`}
-                    >
+                  <Link key={article.id} className="blog-card" href={`/blog/${article.slug}`}>
                     {article.cover_url && (
                       <div className="thumb">
                         <Image

@@ -561,7 +561,7 @@ img {
   background: var(--bg-soft);
 }
 
-/* ----- Recent discussions horizontal scroll ----- */
+/* ----- Recent discussions (3 static banners) ----- */
 .past-events {
   margin-top: clamp(48px, 5vw, 72px);
 }
@@ -569,97 +569,35 @@ img {
   margin: 0 0 clamp(28px, 3vw, 40px) 0;
 }
 
-.discussions-scroll {
-  display: flex;
-  gap: clamp(14px, 1.4vw, 20px);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 6px;
-  /* allow scroll to bleed to screen edge on mobile */
-  margin-right: calc(-1 * var(--pad-x));
-  padding-right: var(--pad-x);
+.past-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 1.6vw, 24px);
+  max-width: 900px;
 }
 
-.discussions-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.discussion-card {
-  flex: 0 0 clamp(280px, 32vw, 420px);
-  scroll-snap-align: start;
+.past-card {
+  display: block;
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1 / 1;
   background: var(--bg-soft);
-  display: block;
-  text-decoration: none;
-  transition:
-    transform var(--t-fast),
-    box-shadow var(--t);
 }
 
-.discussion-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 32px -16px rgba(42, 41, 32, 0.22);
-}
-
-.discussion-card img {
+.past-card img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* square image in square card = no crop */
   display: block;
 }
 
-.discussion-card-empty {
-  position: absolute;
-  inset: 0;
-  background: var(--bg-soft);
-}
-
-/* Number badge */
-.discussion-num {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 4px 10px;
-  border-radius: 20px;
-  line-height: 1;
-  z-index: 1;
-}
-
-/* Title overlay at bottom */
-.discussion-title {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 36px 16px 16px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 100%);
-  font-size: 14px;
-  line-height: 1.35;
-  color: #fff;
-  z-index: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 @media (max-width: 720px) {
-  .discussion-card {
-    flex: 0 0 72vw;
+  .past-grid {
+    grid-template-columns: 1fr;
+    max-width: 360px;
   }
 }
 
@@ -1243,7 +1181,9 @@ img {
   border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
   padding: clamp(24px, 4vw, 40px);
-  box-shadow: 0 1px 0 rgba(42, 41, 32, 0.02), 0 12px 32px -24px rgba(42, 41, 32, 0.12);
+  box-shadow:
+    0 1px 0 rgba(42, 41, 32, 0.02),
+    0 12px 32px -24px rgba(42, 41, 32, 0.12);
 }
 
 .apply-field {

@@ -21,10 +21,26 @@ export default function NotFound() {
       }}
     >
       <div style={{ maxWidth: 480 }}>
-        <p style={{ fontSize: 13, color: "#6B6558", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 16 }}>
+        <p
+          style={{
+            fontSize: 13,
+            color: "#6B6558",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            marginBottom: 16,
+          }}
+        >
           404
         </p>
-        <h1 style={{ fontSize: 32, fontWeight: 400, color: "#2A2920", margin: "0 0 16px", letterSpacing: "-0.015em" }}>
+        <h1
+          style={{
+            fontSize: 32,
+            fontWeight: 400,
+            color: "#2A2920",
+            margin: "0 0 16px",
+            letterSpacing: "-0.015em",
+          }}
+        >
           Page not found
         </h1>
         <p style={{ fontSize: 17, color: "#6B6558", lineHeight: 1.6, margin: "0 0 32px" }}>

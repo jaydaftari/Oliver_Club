@@ -60,7 +60,11 @@ export default function EmailForm() {
         <span className="btn-label">{btnLabel}</span>
       </button>
       {msg.text && (
-        <p id="email-form-msg" className={`form-msg${msg.kind ? ` ${msg.kind}` : ""}`} aria-live="polite">
+        <p
+          id="email-form-msg"
+          className={`form-msg${msg.kind ? ` ${msg.kind}` : ""}`}
+          aria-live="polite"
+        >
           {msg.text}
         </p>
       )}

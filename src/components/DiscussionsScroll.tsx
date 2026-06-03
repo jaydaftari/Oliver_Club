@@ -1,30 +1,28 @@
 import Image from "next/image";
-import { getPublishedArticles } from "@/lib/articles";
 
-export default async function DiscussionsScroll() {
-  const articles = await getPublishedArticles();
+// Recent discussions on the homepage are three fixed, static banners (the design).
+// They are not links. Dynamic, DB-driven write-ups live on the Insights page (/blog).
+const BANNERS = [
+  "/discussions/discussion-1.png",
+  "/discussions/discussion-2.png",
+  "/discussions/discussion-3.png",
+];
 
-  if (articles.length === 0) return null;
-
+export default function DiscussionsScroll() {
   return (
     <section className="past-events">
       <h2 className="h-section">Recent discussions</h2>
-      <div className="discussions-scroll">
-        {articles.map((a) => (
-          <a key={a.slug} className="discussion-card" href={`/blog/${a.slug}`} aria-label={a.title}>
-            {a.cover_url ? (
-              <Image
-                src={a.cover_url}
-                alt={a.title}
-                fill
-                style={{ objectFit: "cover" }}
-                sizes="(max-width: 880px) 72vw, 32vw"
-              />
-            ) : (
-              <div className="discussion-card-empty" />
-            )}
-            {a.title && <span className="discussion-title">{a.title}</span>}
-          </a>
+      <div className="past-grid">
+        {BANNERS.map((src) => (
+          <div key={src} className="past-card">
+            <Image
+              src={src}
+              alt="Past Olivier Club discussion"
+              fill
+              style={{ objectFit: "cover" }}
+              sizes="(max-width: 720px) 360px, 300px"
+            />
+          </div>
         ))}
       </div>
     </section>
