@@ -80,9 +80,14 @@ export default function HomePage() {
             </div>
 
             <div className="home-cta-row">
-              <Link className="btn btn-ghost" href="/global-networking">
+              <a
+                className="btn btn-ghost"
+                href="https://luma.com/olivierclub"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 See some events
-              </Link>
+              </a>
               <Link className="btn btn-ghost" href="/blog">
                 Insights
               </Link>
