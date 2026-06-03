@@ -17,7 +17,7 @@ export default async function DiscussionsScroll() {
                 src={a.cover_url}
                 alt={a.title}
                 fill
-                style={{ objectFit: "contain" }}
+                style={{ objectFit: "cover" }}
                 sizes="(max-width: 880px) 72vw, 32vw"
               />
             ) : (
