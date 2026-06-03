@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getPublishedArticles } from "@/lib/articles";
 
 export default async function DiscussionsScroll() {
@@ -12,8 +13,13 @@ export default async function DiscussionsScroll() {
         {articles.map((a) => (
           <a key={a.slug} className="discussion-card" href={`/blog/${a.slug}`} aria-label={a.title}>
             {a.cover_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={a.cover_url} alt={a.title} loading="lazy" />
+              <Image
+                src={a.cover_url}
+                alt={a.title}
+                fill
+                style={{ objectFit: "cover" }}
+                sizes="(max-width: 880px) 72vw, 24vw"
+              />
             ) : (
               <div className="discussion-card-empty" />
             )}

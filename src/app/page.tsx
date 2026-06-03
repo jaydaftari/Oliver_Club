@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import Footer from "@/components/Footer";
 import EmailForm from "@/components/EmailForm";
 import DiscussionsScroll from "@/components/DiscussionsScroll";
@@ -43,7 +44,7 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
 
-      <main className="main">
+      <main className="main" id="main-content">
         <div className="container">
           <section className="home-intro">
             <h1 className="h-display">Olivier, made for visionaries and ambitious people.</h1>
@@ -96,12 +97,13 @@ export default function HomePage() {
                 </p>
                 <EmailForm />
               </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 className="palm"
                 src="https://vavrykworld.com/wp-content/uploads/2026/01/2e800bec-e172-4b1a-9292-e00f9b48b1ca.webp"
                 alt="Palm leaves over the sea at golden hour"
-                loading="lazy"
+                width={800}
+                height={500}
+                style={{ width: "100%", height: "auto" }}
               />
             </div>
           </section>

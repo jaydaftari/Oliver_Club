@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
 
@@ -17,9 +19,7 @@ export const metadata: Metadata = {
   },
 };
 
-const APPLY_URL =
-  process.env.NEXT_PUBLIC_APPLY_URL ||
-  "https://docs.google.com/forms/d/e/1FAIpQLSdbWHDsUuSMjw7w3GgIFDmR_vB1w7LAneoxF7qjfzjL06OpXQ/viewform";
+const APPLY_URL = "/apply?source=global-networking";
 
 export default function GlobalNetworkingPage() {
   return (
@@ -40,23 +40,20 @@ export default function GlobalNetworkingPage() {
                 events to change the world.
               </p>
               <div className="cta-row">
-                <a
-                  className="btn btn-primary"
-                  href={APPLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link className="btn btn-primary" href={APPLY_URL}>
                   Join the Club
-                </a>
+                </Link>
               </div>
             </div>
             <div className="hero-side">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 className="side-img"
                 src="https://vavrykworld.com/wp-content/uploads/2026/04/IMG_2852-scaled.jpg"
                 alt="Olivier Club networking event"
-                loading="lazy"
+                width={800}
+                height={600}
+                style={{ width: "100%", height: "auto" }}
+                priority
               />
             </div>
           </section>
@@ -73,22 +70,18 @@ export default function GlobalNetworkingPage() {
                 knowledge. Launch ambitious startups connecting with like-minded.
               </p>
               <div className="cta-row">
-                <a
-                  className="btn btn-primary"
-                  href={APPLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link className="btn btn-primary" href={APPLY_URL}>
                   <span>Apply Now</span>
                   <span className="arrow">→</span>
-                </a>
+                </Link>
               </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 className="side-img membership-img"
                 src="https://vavrykworld.com/wp-content/uploads/2026/05/IMG_3875-scaled.jpg"
                 alt="Olivier Club members gathering"
-                loading="lazy"
+                width={800}
+                height={600}
+                style={{ width: "100%", height: "auto" }}
               />
             </div>
 

@@ -45,19 +45,22 @@ export default function EmailForm() {
   return (
     <form className="email-form" onSubmit={handleSubmit} noValidate>
       <input
+        id="email-signup"
         className={`email-input${invalid ? " invalid" : ""}`}
         type="email"
         placeholder="your@email.com"
         autoComplete="email"
         required
+        aria-invalid={invalid ? "true" : undefined}
+        aria-describedby={msg.text ? "email-form-msg" : undefined}
         value={value}
         onChange={handleChange}
       />
-      <button className="btn btn-primary" type="submit" disabled={disabled}>
+      <button className="btn btn-primary" type="submit" disabled={disabled || !value.trim()}>
         <span className="btn-label">{btnLabel}</span>
       </button>
       {msg.text && (
-        <p className={`form-msg${msg.kind ? ` ${msg.kind}` : ""}`} aria-live="polite">
+        <p id="email-form-msg" className={`form-msg${msg.kind ? ` ${msg.kind}` : ""}`} aria-live="polite">
           {msg.text}
         </p>
       )}

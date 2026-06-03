@@ -1,6 +1,6 @@
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
-import { Readable } from "stream";
+import { verifySession } from "@/lib/auth";
 
 function r2Client() {
   return new S3Client({
@@ -14,33 +14,38 @@ function r2Client() {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ key: string[] }> }
 ) {
   const { key } = await params;
   const objectKey = key.join("/");
 
+  // Only images under "uploads/" are public; everything else requires admin auth.
+  if (!objectKey.startsWith("uploads/")) {
+    const token = request.cookies.get("oc_admin")?.value;
+    if (!token || !(await verifySession(token))) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   try {
-    const result = await r2Client().send(
+    const response = await r2Client().send(
       new GetObjectCommand({
         Bucket: process.env.CF_R2_BUCKET,
         Key: objectKey,
       })
     );
 
-    const body = result.Body as Readable;
-    const chunks: Uint8Array[] = [];
-    for await (const chunk of body) {
-      chunks.push(chunk);
-    }
+    const body = await response.Body?.transformToByteArray();
+    if (!body) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    return new NextResponse(Buffer.concat(chunks), {
+    return new NextResponse(Buffer.from(body), {
       headers: {
-        "Content-Type": result.ContentType ?? "application/octet-stream",
+        "Content-Type": response.ContentType ?? "application/octet-stream",
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
   } catch {
-    return new NextResponse("Not found", { status: 404 });
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 }

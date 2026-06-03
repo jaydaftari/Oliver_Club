@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://olivierclub.com";
-const APPLY_URL =
-  process.env.NEXT_PUBLIC_APPLY_URL ||
-  "https://docs.google.com/forms/d/e/1FAIpQLSdbWHDsUuSMjw7w3GgIFDmR_vB1w7LAneoxF7qjfzjL06OpXQ/viewform";
+const APPLY_URL = "/apply?source=social-wellness";
 
 export const metadata: Metadata = {
   title: "Social Wellness Special",
@@ -39,14 +38,9 @@ export default function SocialWellnessPage() {
                 their decision-making in a better way.
               </p>
               <div className="cta-row">
-                <a
-                  className="btn btn-primary"
-                  href={APPLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link className="btn btn-primary" href={APPLY_URL}>
                   Join the Club
-                </a>
+                </Link>
               </div>
             </div>
             <div />
@@ -64,15 +58,10 @@ export default function SocialWellnessPage() {
                 activities. Play padel, golf, join running club and get access to networking events.
               </p>
               <div className="cta-row">
-                <a
-                  className="btn btn-primary"
-                  href={APPLY_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <Link className="btn btn-primary" href={APPLY_URL}>
                   <span>Apply Now</span>
                   <span className="arrow">→</span>
-                </a>
+                </Link>
               </div>
             </div>
 

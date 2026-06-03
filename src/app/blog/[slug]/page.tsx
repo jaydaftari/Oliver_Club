@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import type { Metadata } from "next";
 import sanitizeHtml from "sanitize-html";
+import Image from "next/image";
 import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
 import { getArticleBySlug, getPublishedArticles } from "@/lib/articles";
@@ -109,8 +110,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <article className="container">
           <div className="article">
             {article.cover_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="article-cover" src={article.cover_url} alt={article.title} />
+              <Image
+                className="article-cover"
+                src={article.cover_url}
+                alt={article.title}
+                width={1200}
+                height={630}
+                style={{ width: "100%", height: "auto" }}
+                priority
+              />
             )}
 
             <header className="article-header">

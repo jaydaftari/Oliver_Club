@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
 import { getPublishedArticles } from "@/lib/articles";
@@ -26,7 +27,7 @@ export default async function BlogPage() {
     <div className="page">
       <BackLink href="/" label="Back to Home" />
 
-      <main className="main">
+      <main className="main" id="main-content">
         <div className="container">
           <section className="hero hero-single">
             <div className="hero-text">
@@ -39,67 +40,49 @@ export default async function BlogPage() {
           </section>
 
           <section className="blog-grid">
-            {/* Static featured post */}
-            <Link
-              className="blog-card featured"
-              href="/blog/physical-ai"
-              aria-label="Read: From Physical AI discussion"
-            >
-              <div className="thumb">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://vavrykworld.com/wp-content/uploads/2026/05/TRAKA-2.png"
-                  alt="From Physical AI discussion"
-                />
-              </div>
-              <div className="body-area">
-                <div className="meta">
-                  <time dateTime="2026-05-13">May 13, 2026</time>
-                  <span className="dot">•</span>
-                  <span>8 min read</span>
-                </div>
-                <h2 className="title">From Physical AI discussion</h2>
-                <p className="excerpt">
-                  More than 50% of AI startups abandoned after POC. What&apos;s going on nowadays in
-                  Silicon Valley triggers both excitement and fear.
-                </p>
-              </div>
-            </Link>
-
-            {/* Dynamic articles from database */}
-            {dbArticles.map((article) => {
-              const date = article.published_at
-                ? new Date(article.published_at)
-                : new Date(article.created_at);
-              return (
-                <Link
-                  key={article.id}
-                  className="blog-card"
-                  href={`/blog/${article.slug}`}
-                  aria-label={`Read: ${article.title}`}
-                >
-                  {article.cover_url && (
-                    <div className="thumb">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={article.cover_url} alt={article.title} />
+            {dbArticles.length === 0 ? (
+              <p style={{ color: "#6B6558", gridColumn: "1/-1" }}>
+                No discussions published yet.
+              </p>
+            ) : (
+              dbArticles.map((article) => {
+                const date = article.published_at
+                  ? new Date(article.published_at)
+                  : new Date(article.created_at);
+                return (
+                  <Link
+                    key={article.id}
+                    className="blog-card"
+                    href={`/blog/${article.slug}`}
+                    >
+                    {article.cover_url && (
+                      <div className="thumb">
+                        <Image
+                          src={article.cover_url}
+                          alt={article.title}
+                          fill
+                          style={{ objectFit: "cover" }}
+                          sizes="(max-width: 600px) 100vw, 50vw"
+                        />
+                      </div>
+                    )}
+                    <div className="body-area">
+                      <div className="meta">
+                        <time dateTime={date.toISOString().slice(0, 10)}>
+                          {date.toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </time>
+                      </div>
+                      <h2 className="title">{article.title}</h2>
+                      {article.excerpt && <p className="excerpt">{article.excerpt}</p>}
                     </div>
-                  )}
-                  <div className="body-area">
-                    <div className="meta">
-                      <time dateTime={date.toISOString().slice(0, 10)}>
-                        {date.toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </time>
-                    </div>
-                    <h2 className="title">{article.title}</h2>
-                    {article.excerpt && <p className="excerpt">{article.excerpt}</p>}
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })
+            )}
           </section>
         </div>
       </main>

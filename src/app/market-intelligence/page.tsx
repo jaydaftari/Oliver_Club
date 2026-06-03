@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import BackLink from "@/components/BackLink";
 import Footer from "@/components/Footer";
 import VideoBlock from "@/components/VideoBlock";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://olivierclub.com";
-const APPLY_URL =
-  process.env.NEXT_PUBLIC_APPLY_URL ||
-  "https://docs.google.com/forms/d/e/1FAIpQLSdbWHDsUuSMjw7w3GgIFDmR_vB1w7LAneoxF7qjfzjL06OpXQ/viewform";
+const APPLY_URL = "/apply?source=market-intelligence";
 
 export const metadata: Metadata = {
   title: "Market Intelligence Program",
@@ -112,15 +111,10 @@ export default function MarketIntelligencePage() {
               If you have an MVP and the drive to build something that matters, we want to hear from
               you.
             </p>
-            <a
-              className="btn btn-primary"
-              href={APPLY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link className="btn btn-primary" href={APPLY_URL}>
               <span>Apply Now</span>
               <span className="arrow">→</span>
-            </a>
+            </Link>
           </section>
         </div>
       </main>
