@@ -53,6 +53,43 @@ export async function getAllArticles(): Promise<Article[]> {
   return rows as Article[];
 }
 
+export type ArticlesPage = {
+  rows: Article[];
+  total: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+};
+
+/** Server-side paginated articles. `page` is 1-based. */
+export async function getArticlesPage(page = 1, pageSize = 10): Promise<ArticlesPage> {
+  const safeSize = Math.min(Math.max(1, Math.floor(pageSize)), 100);
+  try {
+    const countRows = await sql`SELECT COUNT(*)::int AS total FROM oc_discussions`;
+    const total = (countRows[0] as { total: number })?.total ?? 0;
+    const pageCount = Math.max(1, Math.ceil(total / safeSize));
+    const safePage = Math.min(Math.max(1, Math.floor(page)), pageCount);
+    const offset = (safePage - 1) * safeSize;
+    const rows = await sql`
+      SELECT * FROM oc_discussions
+      ORDER BY number ASC, created_at DESC
+      LIMIT ${safeSize} OFFSET ${offset}
+    `;
+    return { rows: rows as Article[], total, page: safePage, pageSize: safeSize, pageCount };
+  } catch {
+    return { rows: [], total: 0, page: 1, pageSize: safeSize, pageCount: 1 };
+  }
+}
+
+export async function countArticles(): Promise<number> {
+  try {
+    const rows = await sql`SELECT COUNT(*)::int AS total FROM oc_discussions`;
+    return (rows[0] as { total: number })?.total ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 export async function getArticleById(id: number): Promise<Article | null> {
   const rows = await sql`SELECT * FROM oc_discussions WHERE id = ${id}`;
   return (rows[0] as Article) ?? null;

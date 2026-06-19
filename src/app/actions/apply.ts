@@ -12,13 +12,19 @@ const ALLOWED_SOURCES = new Set([
   "direct",
 ]);
 
+/**
+ * Answers collected through the "Hero Journey" ski-game (see /apply).
+ * Field ids match the QUESTIONS list in the game controller.
+ */
 export type ApplicationInput = {
-  name: string;
+  identity: string;
+  conflict: string;
+  solution: string;
+  path: string;
+  leader: string;
+  teach: string;
   email: string;
-  phone: string;
-  city: string;
-  companyTitle: string;
-  socialMedias: string;
+  links: string;
   source: string;
 };
 
@@ -26,33 +32,28 @@ export type SubmitResult =
   | { ok: true; message: string }
   | { ok: false; message: string; field?: keyof ApplicationInput };
 
-function clean(value: unknown, max = 500): string {
+function clean(value: unknown, max = 4000): string {
   if (typeof value !== "string") return "";
   return value.trim().slice(0, max);
 }
 
 export async function submitApplication(input: ApplicationInput): Promise<SubmitResult> {
-  const name = clean(input.name, 200);
+  const identity = clean(input.identity, 200);
+  const conflict = clean(input.conflict, 4000);
+  const solution = clean(input.solution, 4000);
+  const path = clean(input.path, 4000);
+  const leader = clean(input.leader, 4000);
+  const teach = clean(input.teach, 4000);
   const email = clean(input.email, 200).toLowerCase();
-  const phone = clean(input.phone, 60);
-  const city = clean(input.city, 120);
-  const companyTitle = clean(input.companyTitle, 240);
-  const socialMedias = clean(input.socialMedias, 500);
+  const links = clean(input.links, 500);
   const rawSource = clean(input.source, 60);
   const source = ALLOWED_SOURCES.has(rawSource) ? rawSource : "direct";
 
-  if (!name) {
-    return { ok: false, message: "Please enter your name.", field: "name" };
+  if (!identity) {
+    return { ok: false, message: "Tell us what you call yourself.", field: "identity" };
   }
   if (!EMAIL_RE.test(email)) {
     return { ok: false, message: "Please enter a valid email address.", field: "email" };
-  }
-  if (!companyTitle) {
-    return {
-      ok: false,
-      message: "Please share your company or title.",
-      field: "companyTitle",
-    };
   }
 
   await ensureApplicationsTable();
@@ -60,10 +61,10 @@ export async function submitApplication(input: ApplicationInput): Promise<Submit
   try {
     await sql`
       INSERT INTO oliver_club_applications
-        (name, email, phone, city, company_title, social_medias, source)
+        (identity, conflict, solution, path, leader, teach, email, links, source)
       VALUES
-        (${name}, ${email}, ${phone || null}, ${city || null},
-         ${companyTitle}, ${socialMedias || null}, ${source})
+        (${identity}, ${conflict || null}, ${solution || null}, ${path || null},
+         ${leader || null}, ${teach || null}, ${email}, ${links || null}, ${source})
     `;
     return { ok: true, message: "Thanks — we've received your application." };
   } catch (err) {
