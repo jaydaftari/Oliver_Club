@@ -336,16 +336,13 @@ export default function HeroJourneyGame({ source }: { source: string }) {
     const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Ctor || !fieldRef.current) return;
 
-    const BLOCKED =
-      "Mic is blocked for this site. Click the lock/camera icon in the address bar → allow Microphone, then reload. (On Mac also check System Settings → Privacy → Microphone for your browser.)";
+    const BLOCKED = "Mic blocked. Allow it via the address-bar lock icon, then reload.";
 
     // The browser's speech service refuses plain-http origins (http://localhost
     // included) and returns "not-allowed" no matter the mic permission. So on a
     // non-https page, guide to HTTPS up front instead of failing confusingly.
     if (window.location.protocol !== "https:") {
-      setError(
-        "Voice needs a secure (https) connection. Locally: run `npm run dev:https` and open https://localhost:3000. It works automatically on the live site."
-      );
+      setError("Voice needs https — type your answer, or use the live site.");
       return;
     }
 
@@ -371,7 +368,7 @@ export default function HeroJourneyGame({ source }: { source: string }) {
         stream.getTracks().forEach((t) => t.stop());
       } catch (err) {
         const name = err instanceof DOMException ? err.name : "";
-        setError(name === "NotFoundError" ? "No microphone found on this device." : BLOCKED);
+        setError(name === "NotFoundError" ? "No microphone found." : BLOCKED);
         return;
       }
     }
@@ -405,13 +402,13 @@ export default function HeroJourneyGame({ source }: { source: string }) {
           setError(BLOCKED);
           break;
         case "service-not-allowed":
-          setError("Voice isn't available in this browser — try Chrome, or type your answer.");
+          setError("Voice isn't supported here — type your answer.");
           break;
         case "audio-capture":
-          setError("No microphone found on this device.");
+          setError("No microphone found.");
           break;
         case "no-speech":
-          setError("Didn't catch that — tap the mic and try again.");
+          setError("Didn't catch that — try again.");
           break;
         // "aborted" = we stopped it on purpose (e.g. moving on) — stay silent.
       }

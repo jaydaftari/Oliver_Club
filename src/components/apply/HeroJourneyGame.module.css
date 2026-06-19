@@ -306,9 +306,16 @@ textarea.field {
 .err {
   font-family: var(--read);
   font-size: 19px;
+  line-height: 1.15;
   color: var(--red);
   min-height: 22px;
   flex: 1;
+  /* never let an error push the card taller than ~2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .nav {
   display: flex;
@@ -472,21 +479,53 @@ textarea.field {
   }
   .card {
     width: 100%;
-    padding: 16px 16px 18px;
+    padding: 12px 14px 12px;
     box-shadow: 6px 6px 0 rgba(42, 41, 32, 0.22);
     max-height: 72dvh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
+  .qIndex {
+    margin: 0 0 4px;
+  }
   .qText {
-    font-size: 22px;
-    line-height: 1.08;
+    font-size: 20px;
+    line-height: 1.06;
   }
   .qDesc {
-    font-size: 18px;
+    font-size: 16px;
+    margin-top: 4px;
   }
+  .fieldWrap {
+    margin-top: 8px;
+  }
+  /* shorter answer box on mobile so the card fits without scrolling */
   .field {
     font-size: 18px;
+    height: 46px;
+    padding: 6px 12px;
+  }
+  textarea.field {
+    height: 46px;
+    min-height: 46px;
+  }
+  .voiceBtn {
+    width: 30px;
+    height: 30px;
+  }
+  .fieldVoice {
+    padding-right: 44px;
+  }
+  .voiceHint {
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  /* the "Press Ctrl + Enter" hint is desktop-only — there's no Ctrl on touch */
+  .hint {
+    display: none;
+  }
+  .btn {
+    padding: 10px 14px;
   }
 
   /* Stack the action row and let buttons share the width. */
