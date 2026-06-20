@@ -1,5 +1,21 @@
 import type { Metadata } from "next";
+import { Press_Start_2P, VT323 } from "next/font/google";
 import HeroJourneyGame from "@/components/apply/HeroJourneyGame";
+
+// Self-hosted (no Google CDN round-trip) + display:swap, so the pixel UI
+// renders instantly with system fallbacks and swaps in with no layout shift.
+const pixelFont = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-pix",
+});
+const readoutFont = VT323({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-read",
+});
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://olivierclub.com";
 
@@ -32,5 +48,13 @@ export default async function ApplyPage({ searchParams }: { searchParams: Search
   const sourceParam = Array.isArray(raw) ? raw[0] : raw;
   const source = sourceParam && ALLOWED_SOURCES.has(sourceParam) ? sourceParam : "direct";
 
-  return <HeroJourneyGame source={source} />;
+  return (
+    <>
+      {/* Start fetching the canvas engine in parallel with hydration. */}
+      <link rel="preload" href="/apply-game.js" as="script" />
+      <div className={`${pixelFont.variable} ${readoutFont.variable}`}>
+        <HeroJourneyGame source={source} />
+      </div>
+    </>
+  );
 }

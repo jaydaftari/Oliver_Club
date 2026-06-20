@@ -565,6 +565,14 @@ export default function HeroJourneyGame({ source }: { source: string }) {
     <div className={styles.root}>
       <Script src="/apply-game.js" strategy="afterInteractive" onLoad={boot} />
 
+      {/* Branded loading screen — covers the blank canvas until the engine
+          boots, so a slow connection shows progress instead of an empty sky. */}
+      <div className={`${styles.loader} ${ready ? styles.loaderHidden : ""}`} aria-hidden={ready}>
+        <p className={styles.loaderTitle}>OLIVIER</p>
+        <div className={styles.loaderBar} />
+        <p className={styles.loaderSub}>Preparing your hero journey…</p>
+      </div>
+
       <canvas ref={canvasRef} className={styles.scene} />
 
       <div className={styles.hud}>

@@ -7,6 +7,25 @@ import VideoBlock from "@/components/VideoBlock";
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://olivierclub.com";
 const APPLY_URL = "/apply?source=market-intelligence";
 
+// Vimeo background-video id used by the landscape <VideoBlock />.
+const LANDSCAPE_VIMEO_ID = "1182624628";
+
+/** Fetch Vimeo's official poster frame (cached daily) so the tile shows an
+ *  image instantly instead of a black box while the player loads. */
+async function getVimeoPoster(videoId: string): Promise<string | undefined> {
+  try {
+    const res = await fetch(
+      `https://vimeo.com/api/oembed.json?url=https://vimeo.com/${videoId}&width=1280`,
+      { next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return undefined;
+    const data = (await res.json()) as { thumbnail_url?: unknown };
+    return typeof data.thumbnail_url === "string" ? data.thumbnail_url : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export const metadata: Metadata = {
   title: "Market Intelligence Program",
   description:
@@ -20,7 +39,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MarketIntelligencePage() {
+export default async function MarketIntelligencePage() {
+  const poster = await getVimeoPoster(LANDSCAPE_VIMEO_ID);
+
   return (
     <div className="page">
       <BackLink href="/" label="Back to Home" />
@@ -34,7 +55,7 @@ export default function MarketIntelligencePage() {
                 Built by CMOs and investors for strategists, those who are sick enough with their
                 ideas.
               </p>
-              <VideoBlock landscape />
+              <VideoBlock landscape poster={poster} />
             </div>
           </section>
 

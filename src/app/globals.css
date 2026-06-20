@@ -994,7 +994,36 @@ img {
   height: 100%;
   border: 0;
   display: block;
-  background: #000;
+  background: transparent;
+}
+
+/* Fade the video in over the poster once the iframe has actually loaded,
+   so the tile never flashes a long black box. */
+.video-block .video-iframe.video-fade {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.video-block .video-iframe.video-fade.video-loaded {
+  opacity: 1;
+}
+
+/* Quiet loading shimmer shown until the video is ready (mainly visible when
+   no poster is available). */
+.video-block .video-spinner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  animation: video-spin 0.8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes video-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .video-block:hover {
