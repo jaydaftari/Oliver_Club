@@ -15,6 +15,9 @@ export async function login(_prev: unknown, formData: FormData): Promise<{ error
     return { error: "Too many login attempts. Try again in 15 minutes." };
   }
 
+  // Count every attempt against the limit, not just failures.
+  await recordLoginAttempt();
+
   const email = ((formData.get("email") as string) ?? "").trim();
   const password = (formData.get("password") as string) ?? "";
 
@@ -26,7 +29,6 @@ export async function login(_prev: unknown, formData: FormData): Promise<{ error
   }
 
   if (!valid) {
-    await recordLoginAttempt();
     return { error: "Invalid email or password." };
   }
 

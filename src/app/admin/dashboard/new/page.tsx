@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireAdmin } from "@/lib/auth";
 import ArticleForm from "@/components/admin/ArticleForm";
 
 const adminStyle: React.CSSProperties = {
@@ -8,7 +9,8 @@ const adminStyle: React.CSSProperties = {
   color: "#2A2920",
 };
 
-export default function NewArticlePage() {
+export default async function NewArticlePage() {
+  await requireAdmin();
   return (
     <div style={adminStyle}>
       <header

@@ -1,7 +1,13 @@
 import { ensureTable, getArticlesPage, countArticles } from "@/lib/articles";
 import { getSignupsPage, countSignups } from "@/lib/signups";
 import { getApplications, countApplications } from "@/lib/applications";
+import { getMembers, countMembers } from "@/lib/members";
+import { getEvents, countEvents, getWorkshops, countWorkshops } from "@/lib/club";
+import { requireAdmin } from "@/lib/auth";
 import { logout } from "@/app/admin/actions";
+import MembersPanel from "@/components/admin/MembersPanel";
+import EventsPanel from "@/components/admin/EventsPanel";
+import WorkshopsPanel from "@/components/admin/WorkshopsPanel";
 import Link from "next/link";
 import DeleteButton from "@/components/admin/DeleteButton";
 import ApplicationsPanel from "@/components/admin/ApplicationsPanel";
@@ -48,18 +54,30 @@ const emptyBox = (text: string): React.ReactElement => (
 );
 
 export default async function AdminDashboard({ searchParams }: { searchParams: SearchParams }) {
+  await requireAdmin();
   await ensureTable();
   const sp = await searchParams;
 
   const rawTab = one(sp.tab);
-  const tab: TabKey = rawTab === "signups" || rawTab === "applications" ? rawTab : "articles";
+  const tab: TabKey =
+    rawTab === "signups" ||
+    rawTab === "applications" ||
+    rawTab === "members" ||
+    rawTab === "events" ||
+    rawTab === "workshops"
+      ? rawTab
+      : "articles";
 
   // Cheap counts for the tab badges; full data only for the active tab.
-  const [articleCount, signupCount, applicationCount] = await Promise.all([
-    countArticles(),
-    countSignups(),
-    countApplications(),
-  ]);
+  const [articleCount, signupCount, applicationCount, memberCount, eventCount, workshopCount] =
+    await Promise.all([
+      countArticles(),
+      countSignups(),
+      countApplications(),
+      countMembers(),
+      countEvents(),
+      countWorkshops(),
+    ]);
 
   const articles =
     tab === "articles" ? await getArticlesPage(toPage(sp.aPage), ARTICLES_PAGE_SIZE) : null;
@@ -69,6 +87,9 @@ export default async function AdminDashboard({ searchParams }: { searchParams: S
     tab === "applications"
       ? await getApplications(toPage(sp.appPage), APPLICATIONS_PAGE_SIZE)
       : null;
+  const members = tab === "members" ? await getMembers() : null;
+  const events = tab === "events" ? await getEvents() : null;
+  const workshops = tab === "workshops" ? await getWorkshops() : null;
 
   return (
     <div style={adminStyle}>
@@ -120,7 +141,14 @@ export default async function AdminDashboard({ searchParams }: { searchParams: S
       {/* ── tabs ── */}
       <DashboardNav
         active={tab}
-        counts={{ articles: articleCount, signups: signupCount, applications: applicationCount }}
+        counts={{
+          articles: articleCount,
+          signups: signupCount,
+          applications: applicationCount,
+          members: memberCount,
+          events: eventCount,
+          workshops: workshopCount,
+        }}
       />
 
       <main style={{ padding: "clamp(24px, 4vw, 56px) clamp(16px, 4vw, 60px)" }}>
@@ -135,6 +163,9 @@ export default async function AdminDashboard({ searchParams }: { searchParams: S
             pageSize={applications.pageSize}
           />
         )}
+        {tab === "members" && members && <MembersPanel members={members} />}
+        {tab === "events" && events && <EventsPanel events={events} />}
+        {tab === "workshops" && workshops && <WorkshopsPanel workshops={workshops} />}
       </main>
     </div>
   );

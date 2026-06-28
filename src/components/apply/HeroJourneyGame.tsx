@@ -382,6 +382,12 @@ export default function HeroJourneyGame({ source }: { source: string }) {
     voiceFinalRef.current = "";
 
     rec.onresult = (e) => {
+      // Ignore late events from a recognizer we've already moved past (the
+      // step-change cleanup abort()s it and nulls recRef, but a queued result
+      // can still fire after the next question's field has mounted — without
+      // this guard it would write this answer's base+transcript into that
+      // freshly-mounted field).
+      if (rec !== recRef.current) return;
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const r = e.results[i];
@@ -510,7 +516,16 @@ export default function HeroJourneyGame({ source }: { source: string }) {
       source,
     };
 
-    const result = await submitApplication(payload);
+    let result;
+    try {
+      result = await submitApplication(payload);
+    } catch {
+      // Network/server failure — re-enable so the applicant can retry.
+      setSubmitting(false);
+      setError("Something went wrong. Please try again.");
+      shake();
+      return;
+    }
     if (!result.ok) {
       setSubmitting(false);
       // Jump back to the offending field so they can fix it.

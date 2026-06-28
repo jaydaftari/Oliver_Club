@@ -1,4 +1,5 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { sql } from "./db";
 
 function arrayBufferToHex(buf: ArrayBuffer): string {
@@ -46,6 +47,22 @@ export async function verifySession(token: string): Promise<boolean> {
   return diff === 0;
 }
 
+/** True if the current request carries a valid admin session cookie. */
+export async function isAdminAuthed(): Promise<boolean> {
+  const token = (await cookies()).get("oc_admin")?.value;
+  if (!token) return false;
+  return verifySession(token);
+}
+
+/**
+ * Guard for admin-only pages and server actions. Redirects to the admin login
+ * when the session is missing or expired. Call at the top of any admin route
+ * handler or mutating server action.
+ */
+export async function requireAdmin(): Promise<void> {
+  if (!(await isAdminAuthed())) redirect("/admin");
+}
+
 async function ensureRateLimitTable(): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS oc_login_attempts (
@@ -54,32 +71,41 @@ async function ensureRateLimitTable(): Promise<void> {
       attempted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  // Older installs predate per-action buckets; backfill the column.
+  await sql`ALTER TABLE oc_login_attempts ADD COLUMN IF NOT EXISTS action TEXT NOT NULL DEFAULT 'login'`;
 }
 
 const RATE_LIMIT_WINDOW_MIN = 15;
 const RATE_LIMIT_MAX = 10;
 
-export async function checkLoginRateLimit(): Promise<{ allowed: boolean; remaining: number }> {
-  await ensureRateLimitTable();
+async function clientIp(): Promise<string> {
   const hdrs = await headers();
-  const ip =
-    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "unknown";
+  return hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "unknown";
+}
 
+/**
+ * Sliding-window rate limit keyed by IP + action. `action` lets callers keep
+ * separate buckets (login / signup / reset) so one flow can't exhaust another.
+ */
+export async function checkLoginRateLimit(
+  action = "login",
+  max = RATE_LIMIT_MAX
+): Promise<{ allowed: boolean; remaining: number }> {
+  await ensureRateLimitTable();
+  const ip = await clientIp();
   const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MIN * 60 * 1000).toISOString();
   const rows = await sql`
     SELECT COUNT(*)::int AS cnt FROM oc_login_attempts
-    WHERE ip = ${ip} AND attempted_at > ${windowStart}
+    WHERE ip = ${ip} AND action = ${action} AND attempted_at > ${windowStart}
   `;
   const cnt = (rows[0] as { cnt: number }).cnt;
-  return { allowed: cnt < RATE_LIMIT_MAX, remaining: Math.max(0, RATE_LIMIT_MAX - cnt) };
+  return { allowed: cnt < max, remaining: Math.max(0, max - cnt) };
 }
 
-export async function recordLoginAttempt(): Promise<void> {
+export async function recordLoginAttempt(action = "login"): Promise<void> {
   await ensureRateLimitTable();
-  const hdrs = await headers();
-  const ip =
-    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? hdrs.get("x-real-ip") ?? "unknown";
-  await sql`INSERT INTO oc_login_attempts (ip) VALUES (${ip})`;
+  const ip = await clientIp();
+  await sql`INSERT INTO oc_login_attempts (ip, action) VALUES (${ip}, ${action})`;
 }
 
 export function verifyCredentials(email: string, password: string): boolean {

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { requireAdmin } from "@/lib/auth";
 import { getArticleById } from "@/lib/articles";
 import ArticleForm from "@/components/admin/ArticleForm";
 
@@ -11,6 +12,7 @@ const adminStyle: React.CSSProperties = {
 };
 
 export default async function EditArticlePage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const article = await getArticleById(parseInt(id, 10));
   if (!article) notFound();

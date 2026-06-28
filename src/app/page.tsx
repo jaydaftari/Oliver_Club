@@ -25,7 +25,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "Olivier Club",
   url: BASE_URL,
-  logo: `${BASE_URL}/favicon.ico`,
+  logo: `${BASE_URL}/logo.png`,
   description:
     "A private membership club connecting founders, investors, and engineers across 12 countries through curated events, a startup pre-accelerator, and a social wellness community.",
   contactPoint: {
@@ -63,7 +63,7 @@ export default function HomePage() {
                   className="lead-link"
                   href="https://olivierhome.com/"
                   target="_blank"
-                  rel="noopener"
+                  rel="noopener noreferrer"
                 >
                   Live with innovators
                 </a>{" "}
@@ -90,6 +90,10 @@ export default function HomePage() {
               </a>
               <Link className="btn btn-ghost" href="/blog">
                 Insights
+              </Link>
+              <Link className="btn btn-primary" href="/dashboard">
+                Member login
+                <span className="arrow">→</span>
               </Link>
             </div>
 

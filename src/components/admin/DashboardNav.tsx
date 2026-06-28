@@ -5,12 +5,15 @@ const INK = "#2A2920";
 const OLIVE = "#5B5A3C";
 const RULE = "#E0DCD1";
 
-export type TabKey = "articles" | "signups" | "applications";
+export type TabKey = "articles" | "signups" | "applications" | "members" | "events" | "workshops";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "articles", label: "Articles" },
   { key: "signups", label: "Email signups" },
   { key: "applications", label: "Applications" },
+  { key: "members", label: "Members" },
+  { key: "events", label: "Events" },
+  { key: "workshops", label: "Workshops" },
 ];
 
 /** Top navigation tabs for the admin dashboard. */

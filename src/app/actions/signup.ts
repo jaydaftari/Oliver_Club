@@ -1,6 +1,7 @@
 "use server";
 
 import { sql } from "@/lib/db";
+import { checkLoginRateLimit, recordLoginAttempt } from "@/lib/auth";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -24,6 +25,12 @@ export async function signupEmail(email: string): Promise<{ ok: boolean; message
   if (!EMAIL_RE.test(trimmed)) {
     return { ok: false, message: "Please enter a valid email address." };
   }
+
+  const { allowed } = await checkLoginRateLimit("signup", 5);
+  if (!allowed) {
+    return { ok: false, message: "Too many signups from this network. Try again later." };
+  }
+  await recordLoginAttempt("signup");
 
   await ensureSignupsTable();
 

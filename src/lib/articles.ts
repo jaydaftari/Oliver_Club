@@ -107,18 +107,21 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 }
 
 export async function resolveNumberConflict(number: number, excludeId?: number): Promise<void> {
-  const conflict = excludeId
-    ? await sql`SELECT id FROM oc_discussions WHERE number = ${number} AND id != ${excludeId} LIMIT 1`
-    : await sql`SELECT id FROM oc_discussions WHERE number = ${number} LIMIT 1`;
-
-  if (conflict.length === 0) return;
-
-  const maxRows = excludeId
-    ? await sql`SELECT COALESCE(MAX(number), 0) AS m FROM oc_discussions WHERE id != ${excludeId}`
-    : await sql`SELECT COALESCE(MAX(number), 0) AS m FROM oc_discussions`;
-
-  const next = (maxRows[0] as { m: number }).m + 1;
-  await sql`UPDATE oc_discussions SET number = ${next} WHERE id = ${(conflict[0] as { id: number }).id}`;
+  // Bump any article already holding `number` to one past the current max, in a
+  // single statement so a concurrent save can't read a stale max and collide.
+  if (excludeId) {
+    await sql`
+      UPDATE oc_discussions
+      SET number = (SELECT COALESCE(MAX(number), 0) + 1 FROM oc_discussions WHERE id != ${excludeId})
+      WHERE number = ${number} AND id != ${excludeId}
+    `;
+  } else {
+    await sql`
+      UPDATE oc_discussions
+      SET number = (SELECT COALESCE(MAX(number), 0) + 1 FROM oc_discussions)
+      WHERE number = ${number}
+    `;
+  }
 }
 
 export async function createArticle(data: {

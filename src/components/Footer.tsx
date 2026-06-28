@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="footer">
@@ -9,14 +11,22 @@ export default function Footer() {
           </div>
           <div className="footer-right">
             <div>
+              <span className="label">Members:</span>
+              <Link href="/dashboard">Log in</Link>
+            </div>
+            <div>
               <span className="label">Instagram:</span>
-              <a href="#" target="_blank" rel="noopener">
+              <a
+                href="https://www.instagram.com/olivierclub"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 @olivierclub
               </a>
             </div>
             <div>
               <span className="label">Backed by</span>
-              <a href="#" target="_blank" rel="noopener">
+              <a href="https://fishman.vc" target="_blank" rel="noopener noreferrer">
                 Fishman.vc
               </a>
             </div>

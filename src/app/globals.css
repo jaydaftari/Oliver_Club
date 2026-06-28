@@ -158,6 +158,34 @@ img {
   }
 }
 
+/* 404 (not-found) page animations */
+@keyframes nf-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1.5deg);
+  }
+}
+@keyframes nf-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 680px 0;
+  }
+}
+@keyframes nf-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
 .container {
   width: 100%;
   max-width: var(--max);
@@ -1808,4 +1836,22 @@ img {
 }
 .btn-orange:hover .arrow {
   transform: translateX(4px);
+}
+
+/* ============================================================
+   Reduced motion
+   Honour the user's OS-level "reduce motion" preference: collapse
+   transitions, run looping/entrance animations to their resting
+   state instantly, and disable smooth scrolling.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }

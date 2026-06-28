@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createArticle, updateArticle, deleteArticle, resolveNumberConflict } from "@/lib/articles";
+import { requireAdmin } from "@/lib/auth";
 
 function toSlug(title: string): string {
   return title
@@ -16,6 +18,7 @@ export async function saveArticle(
   _prev: unknown,
   formData: FormData
 ): Promise<{ error: string } | null> {
+  await requireAdmin();
   const idStr = formData.get("id") as string | null;
   const id = idStr ? parseInt(idStr, 10) : null;
 
@@ -47,11 +50,14 @@ export async function saveArticle(
     return { error: "Failed to save. Please try again." };
   }
 
+  revalidatePath("/admin/dashboard");
   redirect("/admin/dashboard");
 }
 
 export async function removeArticle(formData: FormData) {
+  await requireAdmin();
   const id = parseInt(formData.get("id") as string, 10);
   if (!isNaN(id)) await deleteArticle(id);
+  revalidatePath("/admin/dashboard");
   redirect("/admin/dashboard");
 }
