@@ -30,6 +30,10 @@ export type Workshop = {
   vimeo_url: string;
   description: string;
   position: number;
+  /** Key-point start, in seconds. Playback begins here by default (0 = video start). */
+  start_seconds: number;
+  /** Key-point end, in seconds, or null for "play to the end of the video". */
+  end_seconds: number | null;
   created_at: string;
 };
 
@@ -125,14 +129,19 @@ export async function ensureWorkshopsTable(): Promise<void> {
   const existed = !!(reg[0] as { t: string | null })?.t;
   await sql`
     CREATE TABLE IF NOT EXISTS oliver_club_workshops (
-      id          SERIAL PRIMARY KEY,
-      title       TEXT NOT NULL DEFAULT '',
-      vimeo_url   TEXT NOT NULL,
-      description TEXT NOT NULL DEFAULT '',
-      position    INTEGER NOT NULL DEFAULT 0,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      id            SERIAL PRIMARY KEY,
+      title         TEXT NOT NULL DEFAULT '',
+      vimeo_url     TEXT NOT NULL,
+      description   TEXT NOT NULL DEFAULT '',
+      position      INTEGER NOT NULL DEFAULT 0,
+      start_seconds INTEGER NOT NULL DEFAULT 0,
+      end_seconds   INTEGER,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  // Migrate tables created before key-points existed.
+  await sql`ALTER TABLE oliver_club_workshops ADD COLUMN IF NOT EXISTS start_seconds INTEGER NOT NULL DEFAULT 0`;
+  await sql`ALTER TABLE oliver_club_workshops ADD COLUMN IF NOT EXISTS end_seconds INTEGER`;
   if (!existed) {
     for (let i = 0; i < DEFAULT_WORKSHOP_URLS.length; i++) {
       await sql`
@@ -168,26 +177,39 @@ export async function createWorkshop(data: {
   title: string;
   vimeo_url: string;
   description: string;
+  start_seconds: number;
+  end_seconds: number | null;
 }): Promise<void> {
   await ensureWorkshopsTable();
   const maxRows = await sql`SELECT COALESCE(MAX(position), 0) AS m FROM oliver_club_workshops`;
   const position = ((maxRows[0] as { m: number })?.m ?? 0) + 1;
   await sql`
-    INSERT INTO oliver_club_workshops (title, vimeo_url, description, position)
-    VALUES (${data.title}, ${data.vimeo_url}, ${data.description}, ${position})
+    INSERT INTO oliver_club_workshops
+      (title, vimeo_url, description, position, start_seconds, end_seconds)
+    VALUES
+      (${data.title}, ${data.vimeo_url}, ${data.description}, ${position},
+       ${data.start_seconds}, ${data.end_seconds})
   `;
 }
 
 export async function updateWorkshop(
   id: number,
-  data: { title: string; vimeo_url: string; description: string }
+  data: {
+    title: string;
+    vimeo_url: string;
+    description: string;
+    start_seconds: number;
+    end_seconds: number | null;
+  }
 ): Promise<void> {
   await ensureWorkshopsTable();
   await sql`
     UPDATE oliver_club_workshops SET
       title = ${data.title},
       vimeo_url = ${data.vimeo_url},
-      description = ${data.description}
+      description = ${data.description},
+      start_seconds = ${data.start_seconds},
+      end_seconds = ${data.end_seconds}
     WHERE id = ${id}
   `;
 }

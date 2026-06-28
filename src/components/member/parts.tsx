@@ -4,6 +4,7 @@ import { SubmitButton } from "./SubmitButton";
 import type { Person, ActivityItem, Workshop } from "@/lib/club";
 import type { LumaEvent } from "@/lib/luma";
 import { vimeoEmbedSrc } from "@/lib/club-constants";
+import WorkshopPlayer from "./WorkshopPlayer";
 import { T } from "./theme";
 
 /** Shared light-theme pieces used by the dashboard routes. */
@@ -116,7 +117,7 @@ export function EmptyNote({ children }: { children: React.ReactNode }) {
 }
 
 /** A single upcoming event sourced from the Luma calendar. */
-export function LumaEventCard({ event }: { event: LumaEvent }) {
+export function LumaEventCard({ event, badge }: { event: LumaEvent; badge?: string }) {
   const { m, d } = monthDay(event.start_at);
   return (
     <a
@@ -157,14 +158,39 @@ export function LumaEventCard({ event }: { event: LumaEvent }) {
       <div style={{ flex: "1 1 auto", minWidth: 0 }}>
         <div
           style={{
-            font: `600 10px/1 ${T.sans}`,
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            color: T.accent,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
             marginBottom: 5,
+            flexWrap: "wrap",
           }}
         >
-          {timeLabel(event.start_at)}
+          <span
+            style={{
+              font: `600 10px/1 ${T.sans}`,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: T.accent,
+            }}
+          >
+            {timeLabel(event.start_at)}
+          </span>
+          {badge && (
+            <span
+              style={{
+                font: `600 9px/1 ${T.sans}`,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#7a5a1f",
+                background: "rgba(196,160,106,0.22)",
+                border: "1px solid rgba(196,160,106,0.45)",
+                borderRadius: 5,
+                padding: "3px 6px",
+              }}
+            >
+              {badge}
+            </span>
+          )}
         </div>
         <div style={{ fontFamily: T.serif, fontSize: 19, lineHeight: 1.2 }}>{event.name}</div>
         {event.location && (
@@ -262,7 +288,7 @@ export function WorkshopGrid({ workshops }: { workshops: Workshop[] }) {
       }}
     >
       {workshops.map((w) => {
-        const src = vimeoEmbedSrc(w.vimeo_url);
+        const valid = vimeoEmbedSrc(w.vimeo_url) !== null;
         return (
           <div
             key={w.id}
@@ -279,23 +305,15 @@ export function WorkshopGrid({ workshops }: { workshops: Workshop[] }) {
               style={{
                 position: "relative",
                 paddingTop: "56.25%",
-                background: src ? "#000" : "rgba(29,30,26,0.05)",
+                background: valid ? "#000" : "rgba(29,30,26,0.05)",
               }}
             >
-              {src ? (
-                <iframe
-                  src={src}
+              {valid ? (
+                <WorkshopPlayer
+                  vimeoUrl={w.vimeo_url}
                   title={w.title}
-                  loading="lazy"
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  allowFullScreen
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    border: 0,
-                  }}
+                  start={w.start_seconds}
+                  end={w.end_seconds}
                 />
               ) : (
                 <div
@@ -318,7 +336,14 @@ export function WorkshopGrid({ workshops }: { workshops: Workshop[] }) {
             <div style={{ padding: 18, display: "flex", flexDirection: "column", gap: 8 }}>
               <div style={{ fontFamily: T.serif, fontSize: 19, lineHeight: 1.2 }}>{w.title}</div>
               {w.description && (
-                <div style={{ fontSize: 13, lineHeight: 1.5, color: "rgba(29,30,26,0.6)" }}>
+                <div
+                  style={{
+                    fontSize: 13,
+                    lineHeight: 1.5,
+                    color: "rgba(29,30,26,0.6)",
+                    whiteSpace: "pre-line",
+                  }}
+                >
                   {w.description}
                 </div>
               )}

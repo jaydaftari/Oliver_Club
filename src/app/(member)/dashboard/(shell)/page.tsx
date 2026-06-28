@@ -1,4 +1,6 @@
 import { requireMember } from "@/lib/member-session";
+import { getMemberProfile } from "@/lib/members";
+import { resolveMemberLocation } from "@/lib/geo";
 import {
   getAttendedStats,
   getConnectionCount,
@@ -7,7 +9,7 @@ import {
   getPeopleToMeet,
   getActivity,
 } from "@/lib/club";
-import { getUpcomingLumaEvents } from "@/lib/luma";
+import { getMemberLumaEvents } from "@/lib/luma";
 import { T } from "@/components/member/theme";
 import {
   SectionHead,
@@ -22,17 +24,29 @@ import {
 
 export default async function OverviewPage() {
   const session = await requireMember();
+  const profile = await getMemberProfile(session.id);
+  // Combine the saved Profile location with the visitor's detected city.
+  const { location, detectedCity } = await resolveMemberLocation(profile?.location);
 
-  const [attended, events, network, recentNetwork, connections, peopleToMeet, activity] =
+  const [attended, luma, network, recentNetwork, connections, peopleToMeet, activity] =
     await Promise.all([
       getAttendedStats(session.id),
-      getUpcomingLumaEvents(3),
+      getMemberLumaEvents(location),
       getConnectionCount(session.id),
       getRecentConnectionCount(session.id),
       getConnections(session.id, 5),
       getPeopleToMeet(session.id, 2),
       getActivity(4),
     ]);
+
+  // Surface nearby events first, then fill with the rest of the calendar.
+  const nearbyIds = new Set(luma.nearby.map((e) => e.id));
+  const events = [...luma.nearby, ...luma.pool.filter((e) => !nearbyIds.has(e.id))].slice(0, 3);
+  const hasNearby = nearbyIds.size > 0;
+  const nearLabel = (detectedCity || profile?.location || "").split(/[·,/&|]/)[0].trim();
+  const eventsEyebrow = hasNearby
+    ? `Near you${nearLabel ? ` · ${nearLabel}` : ""}`
+    : "Upcoming · via Luma";
 
   const gatherings = [
     { label: "Pitch sessions", n: attended.pitch },
@@ -112,7 +126,7 @@ export default async function OverviewPage() {
         {/* upcoming events (Luma) */}
         <section style={{ ...PANEL, flex: "1.6 1 420px" }}>
           <SectionHead
-            eyebrow="Upcoming · via Luma"
+            eyebrow={eventsEyebrow}
             title="Events & sessions"
             cta={
               <a
@@ -130,7 +144,11 @@ export default async function OverviewPage() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {events.map((e) => (
-                <LumaEventCard key={e.id} event={e} />
+                <LumaEventCard
+                  key={e.id}
+                  event={e}
+                  badge={nearbyIds.has(e.id) ? "Near you" : undefined}
+                />
               ))}
             </div>
           )}

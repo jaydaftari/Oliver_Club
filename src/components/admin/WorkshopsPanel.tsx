@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { Workshop } from "@/lib/club";
-import { vimeoEmbedSrc } from "@/lib/club-constants";
+import { vimeoEmbedSrc, formatTimecode } from "@/lib/club-constants";
 import {
   createWorkshopAction,
   updateWorkshopAction,
@@ -106,6 +106,36 @@ export default function WorkshopsPanel({ workshops }: { workshops: Workshop[] })
             style={{ ...inputStyle, resize: "vertical" }}
           />
         </div>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <div style={{ display: "grid", gap: 6, flex: "1 1 160px" }}>
+            <label style={lbl} htmlFor="w-start">
+              Key point — start
+            </label>
+            <input
+              id="w-start"
+              name="start_time"
+              defaultValue={formatTimecode(editing?.start_seconds ?? 0) || "0:00"}
+              placeholder="0:00"
+              style={inputStyle}
+            />
+          </div>
+          <div style={{ display: "grid", gap: 6, flex: "1 1 160px" }}>
+            <label style={lbl} htmlFor="w-end">
+              Key point — end
+            </label>
+            <input
+              id="w-end"
+              name="end_time"
+              defaultValue={formatTimecode(editing?.end_seconds)}
+              placeholder="full length"
+              style={inputStyle}
+            />
+          </div>
+          <p style={{ ...lbl, flex: "2 1 260px", margin: 0, lineHeight: 1.4 }}>
+            The clip plays from start to end by default. Use <code>m:ss</code> (e.g. 1:30) or plain
+            seconds. Leave end blank to play to the end. Members can still scrub the whole video.
+          </p>
+        </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button type="submit" disabled={pending} style={primaryBtn(pending)}>
             {pending ? "Saving…" : editing ? "Save changes" : "Add workshop"}
@@ -200,6 +230,10 @@ export default function WorkshopsPanel({ workshops }: { workshops: Workshop[] })
                       {w.description}
                     </div>
                   )}
+                  <div style={{ fontSize: 12, color: MUTED }}>
+                    Key point: {formatTimecode(w.start_seconds) || "0:00"} –{" "}
+                    {formatTimecode(w.end_seconds) || "end"}
+                  </div>
                   <div style={{ display: "flex", gap: 6, marginTop: "auto", paddingTop: 8 }}>
                     <button type="button" onClick={() => setEditing(w)} style={rowBtn()}>
                       Edit

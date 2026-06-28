@@ -1,10 +1,19 @@
 import { requireMember } from "@/lib/member-session";
-import { getUpcomingLumaEvents } from "@/lib/luma";
-import { SectionHead, EmptyNote, LumaEventCard, PANEL } from "@/components/member/parts";
+import { getMemberProfile } from "@/lib/members";
+import { resolveMemberLocation } from "@/lib/geo";
+import { getMemberLumaEvents, distinctCities } from "@/lib/luma";
+import { SectionHead, EmptyNote, PANEL } from "@/components/member/parts";
+import EventsBrowser from "./EventsBrowser";
 
 export default async function EventsPage() {
-  await requireMember();
-  const events = await getUpcomingLumaEvents(12);
+  const session = await requireMember();
+  const profile = await getMemberProfile(session.id);
+  const { location, detectedCity } = await resolveMemberLocation(profile?.location);
+  const { pool, nearby } = await getMemberLumaEvents(location);
+
+  const cities = distinctCities(pool);
+  const nearbyIds = nearby.map((e) => e.id);
+  const locationLabel = (detectedCity || profile?.location || "").split(/[·,/&|]/)[0].trim();
 
   return (
     <section style={PANEL}>
@@ -22,14 +31,16 @@ export default async function EventsPage() {
           </a>
         }
       />
-      {events.length === 0 ? (
+      {pool.length === 0 ? (
         <EmptyNote>No upcoming events on the calendar right now. Check back soon.</EmptyNote>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {events.map((e) => (
-            <LumaEventCard key={e.id} event={e} />
-          ))}
-        </div>
+        <EventsBrowser
+          events={pool}
+          nearbyIds={nearbyIds}
+          cities={cities}
+          hasNearby={nearbyIds.length > 0}
+          locationLabel={locationLabel}
+        />
       )}
     </section>
   );
